@@ -2930,7 +2930,7 @@ async function run() {
       const outputLocation = outputDir ? `${outputDir}/${output}` : output;
       const url = `https://raw.githubusercontent.com/${repo}/${ref}/${input}`;
 
-      await download(url, outputLocation);
+      await download(url, options, outputLocation);
     }
 
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.summary.addHeading("Summary")
@@ -2948,7 +2948,7 @@ async function run() {
   }
 }
 
-async function download(url, output) {
+async function download(url, options, output) {
   return new Promise((resolve, reject) => {
     const fileStream = (0,fs__WEBPACK_IMPORTED_MODULE_2__.createWriteStream)(output);
 

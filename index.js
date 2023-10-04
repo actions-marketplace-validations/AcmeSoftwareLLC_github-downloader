@@ -29,7 +29,7 @@ async function run() {
       const outputLocation = outputDir ? `${outputDir}/${output}` : output;
       const url = `https://raw.githubusercontent.com/${repo}/${ref}/${input}`;
 
-      await download(url, outputLocation);
+      await download(url, options, outputLocation);
     }
 
     summary
@@ -48,7 +48,7 @@ async function run() {
   }
 }
 
-async function download(url, output) {
+async function download(url, options, output) {
   return new Promise((resolve, reject) => {
     const fileStream = createWriteStream(output);
 
