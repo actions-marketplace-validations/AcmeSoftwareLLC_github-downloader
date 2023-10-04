@@ -27,7 +27,7 @@ try {
     const fileStream = createWriteStream(output);
 
     get(
-      `https://raw.githubusercontent.com/${org}/${ref}/${input}`,
+      `https://raw.githubusercontent.com/${repo}/${ref}/${input}`,
       options,
       (res) => {
         res.pipe(fileStream);
