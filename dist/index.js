@@ -2914,9 +2914,7 @@ async function run() {
       console.log(`Downloaded "${input}" to "${downloadLocation}".`);
     }
 
-    console.log(
-      `Downloaded Files: ${await (0,promises_namespaceObject.readdir)(outputDir, { recursive: true })}`
-    );
+    const downloadedFiles = listFiles(outputDir);
 
     core.summary.addHeading("Summary")
       .addTable([
@@ -2926,6 +2924,7 @@ async function run() {
         ],
         ["Repo", repo],
         ["Ref", ref],
+        ["Downloaded Files", downloadedFiles],
       ])
       .write();
   } catch (error) {
@@ -2946,6 +2945,21 @@ async function download(url, options, output) {
     }).on("error", (err) => {
       reject(err);
     });
+  });
+}
+
+function listFiles(directory) {
+  (0,promises_namespaceObject.readdir)(directory, (err, files) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+
+    const filesOnly = files.filter((file) => {
+      return (0,external_fs_.statSync)(`${directory}/${file}`).isFile();
+    });
+
+    console.log(filesOnly);
   });
 }
 

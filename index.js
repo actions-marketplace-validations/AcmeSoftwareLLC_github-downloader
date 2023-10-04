@@ -1,6 +1,6 @@
 import { getInput, getMultilineInput, setFailed, summary } from "@actions/core";
 import { get } from "https";
-import { createWriteStream, existsSync } from "fs";
+import { createWriteStream, existsSync, statSync } from "fs";
 import { readdir, mkdir } from "fs/promises";
 import { dirname } from "path";
 
@@ -35,9 +35,7 @@ async function run() {
       console.log(`Downloaded "${input}" to "${downloadLocation}".`);
     }
 
-    console.log(
-      `Downloaded Files: ${await readdir(outputDir, { recursive: true })}`
-    );
+    const downloadedFiles = listFiles(outputDir);
 
     summary
       .addHeading("Summary")
@@ -48,6 +46,7 @@ async function run() {
         ],
         ["Repo", repo],
         ["Ref", ref],
+        ["Downloaded Files", downloadedFiles],
       ])
       .write();
   } catch (error) {
@@ -68,6 +67,21 @@ async function download(url, options, output) {
     }).on("error", (err) => {
       reject(err);
     });
+  });
+}
+
+function listFiles(directory) {
+  readdir(directory, (err, files) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+
+    const filesOnly = files.filter((file) => {
+      return statSync(`${directory}/${file}`).isFile();
+    });
+
+    console.log(filesOnly);
   });
 }
 
