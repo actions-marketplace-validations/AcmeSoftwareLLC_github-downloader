@@ -19,12 +19,12 @@ async function run() {
       };
     }
 
-    console.log(`Test: ${getMultilineInput("includes")}`);
-
     for (const include of getMultilineInput("includes")) {
       const [input, output] = include.split(":");
       const outputLocation = outputDir ? `${outputDir}/${output}` : output;
       const url = `https://raw.githubusercontent.com/${repo}/${ref}/${input}`;
+
+      console.log(`Downloading "${output}" from "${url}"...`);
 
       const downloadLocation = await download(url, options, outputLocation);
 
