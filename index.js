@@ -36,7 +36,7 @@ async function run() {
     }
 
     console.log(
-      `Downloaded Files: ${await readdir(outputDir, (recursive = true))}`
+      `Downloaded Files: ${await readdir(outputDir, { recursive: true })}`
     );
 
     summary

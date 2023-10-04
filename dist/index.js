@@ -2915,7 +2915,7 @@ async function run() {
     }
 
     console.log(
-      `Downloaded Files: ${await (0,promises_namespaceObject.readdir)(outputDir, (recursive = true))}`
+      `Downloaded Files: ${await (0,promises_namespaceObject.readdir)(outputDir, { recursive: true })}`
     );
 
     core.summary.addHeading("Summary")
