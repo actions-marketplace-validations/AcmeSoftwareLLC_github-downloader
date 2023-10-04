@@ -2903,28 +2903,54 @@ __nccwpck_require__.r(__webpack_exports__);
 
 
 
-try {
-  const pat = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)("git-pat");
-  const repo = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)("repo");
-  const ref = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)("ref");
+async function run() {
+  try {
+    const pat = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)("git-pat");
+    const repo = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)("repo");
+    const ref = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)("ref");
+    const outputDir = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)("output-directory");
 
-  console.log(`pat: ${pat}`);
-  console.log(`repo: ${repo}`);
-  console.log(`ref: ${ref}`);
+    console.log(`pat: ${pat}`);
+    console.log(`repo: ${repo}`);
+    console.log(`ref: ${ref}`);
+    console.log(`outputDir: ${outputDir}`);
 
-  const options = {
-    headers: {},
-  };
-
-  if (pat) {
-    options.headers = {
-      Authorization: `token ${pat}`,
+    const options = {
+      headers: {},
     };
+
+    if (pat) {
+      options.headers = {
+        Authorization: `token ${pat}`,
+      };
+    }
+
+    for (const include of (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getMultilineInput)("includes")) {
+      const [input, output] = include.split(":");
+      if (outputDir) {
+        output = `${outputDir}/${output}`;
+      }
+
+      await download(input, output);
+    }
+
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.summary.addHeading("Summary")
+      .addTable([
+        [
+          { data: "Description", header: true },
+          { data: "Result", header: true },
+        ],
+        ["Repo", repo],
+        ["Ref", ref],
+      ])
+      .write();
+  } catch (error) {
+    (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed)(error.message);
   }
+}
 
-  (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getMultilineInput)("includes").forEach((include) => {
-    const [input, output] = include.split(":");
-
+async function download(input, output) {
+  return new Promise((resolve, reject) => {
     const fileStream = (0,fs__WEBPACK_IMPORTED_MODULE_2__.createWriteStream)(output);
 
     (0,https__WEBPACK_IMPORTED_MODULE_1__.get)(
@@ -2935,26 +2961,16 @@ try {
 
         fileStream.on("end", () => {
           console.log(`Downloaded "${input}" to "${output}".`);
+          resolve(output);
         });
       }
     ).on("error", (err) => {
       (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed)(err.message);
     });
   });
-
-  _actions_core__WEBPACK_IMPORTED_MODULE_0__.summary.addHeading("Summary")
-    .addTable([
-      [
-        { data: "Description", header: true },
-        { data: "Result", header: true },
-      ],
-      ["Repo", repo],
-      ["Ref", ref],
-    ])
-    .write();
-} catch (error) {
-  (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed)(error.message);
 }
+
+run();
 
 })();
 
