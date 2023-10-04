@@ -27,8 +27,9 @@ async function run() {
     for (const include of getMultilineInput("includes")) {
       const [input, output] = include.split(":");
       const outputLocation = outputDir ? `${outputDir}/${output}` : output;
+      const url = `https://raw.githubusercontent.com/${repo}/${ref}/${input}`;
 
-      await download(input, outputLocation);
+      await download(url, outputLocation);
     }
 
     summary
@@ -47,22 +48,18 @@ async function run() {
   }
 }
 
-async function download(input, output) {
+async function download(url, output) {
   return new Promise((resolve, reject) => {
     const fileStream = createWriteStream(output);
 
-    get(
-      `https://raw.githubusercontent.com/${repo}/${ref}/${input}`,
-      options,
-      (res) => {
-        res.pipe(fileStream);
+    get(url, options, (res) => {
+      res.pipe(fileStream);
 
-        fileStream.on("end", () => {
-          console.log(`Downloaded "${input}" to "${output}".`);
-          resolve(output);
-        });
-      }
-    ).on("error", (err) => {
+      fileStream.on("end", () => {
+        console.log(`Downloaded "${input}" to "${output}".`);
+        resolve(output);
+      });
+    }).on("error", (err) => {
       setFailed(err.message);
     });
   });
