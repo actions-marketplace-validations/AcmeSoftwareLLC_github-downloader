@@ -2897,6 +2897,9 @@ __nccwpck_require__.r(__webpack_exports__);
 /* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var https__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(687);
 /* harmony import */ var https__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__nccwpck_require__.n(https__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var fs__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(147);
+/* harmony import */ var fs__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__nccwpck_require__.n(fs__WEBPACK_IMPORTED_MODULE_2__);
+
 
 
 
@@ -2922,7 +2925,7 @@ try {
   (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getMultilineInput)("includes").forEach((include) => {
     const [input, output] = include.split(":");
 
-    const fileStream = fs.createWriteStream(output);
+    const fileStream = (0,fs__WEBPACK_IMPORTED_MODULE_2__.createWriteStream)(output);
 
     (0,https__WEBPACK_IMPORTED_MODULE_1__.get)(
       `https://raw.githubusercontent.com/${org}/${ref}/${input}`,

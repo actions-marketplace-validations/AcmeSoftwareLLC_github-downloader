@@ -1,5 +1,6 @@
 import { getInput, getMultilineInput, setFailed, summary } from "@actions/core";
 import { get } from "https";
+import { createWriteStream } from "fs";
 
 try {
   const pat = getInput("git-pat");
@@ -23,7 +24,7 @@ try {
   getMultilineInput("includes").forEach((include) => {
     const [input, output] = include.split(":");
 
-    const fileStream = fs.createWriteStream(output);
+    const fileStream = createWriteStream(output);
 
     get(
       `https://raw.githubusercontent.com/${org}/${ref}/${input}`,
