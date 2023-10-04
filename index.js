@@ -9,11 +9,6 @@ async function run() {
     const ref = getInput("ref");
     const outputDir = getInput("output-directory");
 
-    console.log(`pat: ${pat}`);
-    console.log(`repo: ${repo}`);
-    console.log(`ref: ${ref}`);
-    console.log(`outputDir: ${outputDir}`);
-
     const options = {
       headers: {},
     };
@@ -29,7 +24,9 @@ async function run() {
       const outputLocation = outputDir ? `${outputDir}/${output}` : output;
       const url = `https://raw.githubusercontent.com/${repo}/${ref}/${input}`;
 
-      await download(url, options, outputLocation);
+      const downloadLocation = await download(url, options, outputLocation);
+
+      console.log(`Downloaded "${input}" to "${downloadLocation}".`);
     }
 
     summary
@@ -56,11 +53,10 @@ async function download(url, options, output) {
       res.pipe(fileStream);
 
       fileStream.on("end", () => {
-        console.log(`Downloaded "${input}" to "${output}".`);
         resolve(output);
       });
     }).on("error", (err) => {
-      setFailed(err.message);
+      reject(err);
     });
   });
 }

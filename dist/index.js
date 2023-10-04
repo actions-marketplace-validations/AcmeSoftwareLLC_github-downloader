@@ -2910,11 +2910,6 @@ async function run() {
     const ref = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)("ref");
     const outputDir = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)("output-directory");
 
-    console.log(`pat: ${pat}`);
-    console.log(`repo: ${repo}`);
-    console.log(`ref: ${ref}`);
-    console.log(`outputDir: ${outputDir}`);
-
     const options = {
       headers: {},
     };
@@ -2930,7 +2925,9 @@ async function run() {
       const outputLocation = outputDir ? `${outputDir}/${output}` : output;
       const url = `https://raw.githubusercontent.com/${repo}/${ref}/${input}`;
 
-      await download(url, options, outputLocation);
+      const downloadLocation = await download(url, options, outputLocation);
+
+      console.log(`Downloaded "${input}" to "${downloadLocation}".`);
     }
 
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.summary.addHeading("Summary")
@@ -2956,11 +2953,10 @@ async function download(url, options, output) {
       res.pipe(fileStream);
 
       fileStream.on("end", () => {
-        console.log(`Downloaded "${input}" to "${output}".`);
         resolve(output);
       });
     }).on("error", (err) => {
-      (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed)(err.message);
+      reject(err);
     });
   });
 }
