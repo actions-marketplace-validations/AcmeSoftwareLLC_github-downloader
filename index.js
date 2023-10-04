@@ -81,7 +81,7 @@ function listFiles(directory) {
       return statSync(`${directory}/${file}`).isFile();
     });
 
-    console.log(filesOnly);
+    return filesOnly;
   });
 }
 
