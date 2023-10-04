@@ -1,0 +1,24 @@
+name: Github Downloader
+description: Download files from Github
+inputs:
+  git-pat:
+    description: Github PAT
+    required: true
+  repo:
+    description: Github repository
+    required: true
+  ref:
+    description: Github branch / reference
+    required: true
+    default: main
+  includes:
+    description: Files to include
+    required: true
+  
+runs:
+  using: node20
+  main: dist/index.js
+
+branding:
+  icon: feather
+  color: blue
