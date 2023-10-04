@@ -1,0 +1,29 @@
+name: Test Workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      timezone:
+        description: Time Zone
+        required: true
+        default: Asia/Kathmandu
+
+jobs:
+  download-test:
+    runs-on: ubuntu-latest
+    name: Download Test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Generate
+        id: generate
+        uses: ./
+        with:
+          repo: creativetimofficial/public-assets
+          includes: |
+            /argon-pro-flutter/chat-screen.jpg:screen.jpg
+          output-directory: dist
+
+      - name: Display the generated build number
+        run: echo "Build Number > ${{ steps.generate.outputs.build-number }}"

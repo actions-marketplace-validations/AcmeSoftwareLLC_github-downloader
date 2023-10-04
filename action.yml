@@ -1,19 +1,20 @@
 name: Github Downloader
 description: Download files from Github
 inputs:
-  git-pat:
-    description: Github PAT
+  includes:
+    description: Files to include
     required: true
   repo:
     description: Github repository
     required: true
   ref:
     description: Github branch / reference
-    required: true
     default: main
-  includes:
-    description: Files to include
-    required: true
+  git-pat:
+    description: Github PAT
+  output-directory:
+    description: Output directory
+    default: .
   
 runs:
   using: node20
