@@ -54,7 +54,7 @@ async function download(url, options, output) {
     get(url, options, (res) => {
       res.pipe(fileStream);
 
-      fileStream.on("end", () => {
+      fileStream.on("finish", () => {
         resolve(output);
       });
     }).on("error", (err) => {

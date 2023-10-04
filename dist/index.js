@@ -2954,7 +2954,7 @@ async function download(url, options, output) {
     (0,https__WEBPACK_IMPORTED_MODULE_1__.get)(url, options, (res) => {
       res.pipe(fileStream);
 
-      fileStream.on("end", () => {
+      fileStream.on("finish", () => {
         resolve(output);
       });
     }).on("error", (err) => {
