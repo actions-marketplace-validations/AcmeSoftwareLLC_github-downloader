@@ -2927,11 +2927,9 @@ async function run() {
 
     for (const include of (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getMultilineInput)("includes")) {
       const [input, output] = include.split(":");
-      if (outputDir) {
-        output = `${outputDir}/${output}`;
-      }
+      const outputLocation = outputDir ? `${outputDir}/${output}` : output;
 
-      await download(input, output);
+      await download(input, outputLocation);
     }
 
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.summary.addHeading("Summary")

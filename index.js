@@ -26,11 +26,9 @@ async function run() {
 
     for (const include of getMultilineInput("includes")) {
       const [input, output] = include.split(":");
-      if (outputDir) {
-        output = `${outputDir}/${output}`;
-      }
+      const outputLocation = outputDir ? `${outputDir}/${output}` : output;
 
-      await download(input, output);
+      await download(input, outputLocation);
     }
 
     summary
