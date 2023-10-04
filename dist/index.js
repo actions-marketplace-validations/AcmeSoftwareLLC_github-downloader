@@ -2895,18 +2895,49 @@ var __webpack_exports__ = {};
 __nccwpck_require__.r(__webpack_exports__);
 /* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(935);
 /* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var https__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(687);
+/* harmony import */ var https__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__nccwpck_require__.n(https__WEBPACK_IMPORTED_MODULE_1__);
+
 
 
 try {
   const pat = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)("git-pat");
   const repo = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)("repo");
   const ref = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)("ref");
-  const includes = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)("includes");
 
   console.log(`pat: ${pat}`);
   console.log(`repo: ${repo}`);
   console.log(`ref: ${ref}`);
-  console.log(`includes: ${includes}`);
+
+  const options = {
+    headers: {},
+  };
+
+  if (pat) {
+    options.headers = {
+      Authorization: `token ${pat}`,
+    };
+  }
+
+  (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getMultilineInput)("includes").forEach((include) => {
+    const [input, output] = include.split(":");
+
+    const fileStream = fs.createWriteStream(output);
+
+    (0,https__WEBPACK_IMPORTED_MODULE_1__.get)(
+      `https://raw.githubusercontent.com/${org}/${ref}/${input}`,
+      options,
+      (res) => {
+        res.pipe(fileStream);
+
+        fileStream.on("end", () => {
+          console.log(`Downloaded "${input}" to "${output}".`);
+        });
+      }
+    ).on("error", (err) => {
+      (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed)(err.message);
+    });
+  });
 
   _actions_core__WEBPACK_IMPORTED_MODULE_0__.summary.addHeading("Summary")
     .addTable([
@@ -2915,6 +2946,7 @@ try {
         { data: "Result", header: true },
       ],
       ["Repo", repo],
+      ["Ref", ref],
     ])
     .write();
 } catch (error) {
