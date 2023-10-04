@@ -2925,12 +2925,11 @@ async function run() {
       const outputLocation = outputDir ? `${outputDir}/${output}` : output;
       const url = `https://raw.githubusercontent.com/${repo}/${ref}/${input}`;
 
-      console.log(`Downloading "${output}" from "${url}"...`);
-
       const downloadLocation = await download(url, options, outputLocation);
-
       console.log(`Downloaded "${input}" to "${downloadLocation}".`);
     }
+
+    console.log(`Files: ${(0,fs__WEBPACK_IMPORTED_MODULE_2__.readdirSync)(outputDir)}`);
 
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.summary.addHeading("Summary")
       .addTable([

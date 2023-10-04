@@ -1,6 +1,6 @@
 import { getInput, getMultilineInput, setFailed, summary } from "@actions/core";
 import { get } from "https";
-import { createWriteStream } from "fs";
+import { createWriteStream, readdirSync } from "fs";
 
 async function run() {
   try {
@@ -24,12 +24,11 @@ async function run() {
       const outputLocation = outputDir ? `${outputDir}/${output}` : output;
       const url = `https://raw.githubusercontent.com/${repo}/${ref}/${input}`;
 
-      console.log(`Downloading "${output}" from "${url}"...`);
-
       const downloadLocation = await download(url, options, outputLocation);
-
       console.log(`Downloaded "${input}" to "${downloadLocation}".`);
     }
+
+    console.log(`Files: ${readdirSync(outputDir)}`);
 
     summary
       .addHeading("Summary")
