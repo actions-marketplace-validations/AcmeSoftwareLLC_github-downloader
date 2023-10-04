@@ -2843,35 +2843,6 @@ module.exports = require("util");
 /******/ 	}
 /******/ 	
 /************************************************************************/
-/******/ 	/* webpack/runtime/compat get default export */
-/******/ 	(() => {
-/******/ 		// getDefaultExport function for compatibility with non-harmony modules
-/******/ 		__nccwpck_require__.n = (module) => {
-/******/ 			var getter = module && module.__esModule ?
-/******/ 				() => (module['default']) :
-/******/ 				() => (module);
-/******/ 			__nccwpck_require__.d(getter, { a: getter });
-/******/ 			return getter;
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/define property getters */
-/******/ 	(() => {
-/******/ 		// define getter functions for harmony exports
-/******/ 		__nccwpck_require__.d = (exports, definition) => {
-/******/ 			for(var key in definition) {
-/******/ 				if(__nccwpck_require__.o(definition, key) && !__nccwpck_require__.o(exports, key)) {
-/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
-/******/ 				}
-/******/ 			}
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	(() => {
-/******/ 		__nccwpck_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
-/******/ 	
 /******/ 	/* webpack/runtime/make namespace object */
 /******/ 	(() => {
 /******/ 		// define __esModule on exports
@@ -2892,23 +2863,29 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be in strict mode.
 (() => {
 "use strict";
+// ESM COMPAT FLAG
 __nccwpck_require__.r(__webpack_exports__);
-/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(935);
-/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var https__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(687);
-/* harmony import */ var https__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__nccwpck_require__.n(https__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var fs__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(147);
-/* harmony import */ var fs__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__nccwpck_require__.n(fs__WEBPACK_IMPORTED_MODULE_2__);
+
+// EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
+var core = __nccwpck_require__(935);
+// EXTERNAL MODULE: external "https"
+var external_https_ = __nccwpck_require__(687);
+// EXTERNAL MODULE: external "fs"
+var external_fs_ = __nccwpck_require__(147);
+;// CONCATENATED MODULE: external "fs/promises"
+const promises_namespaceObject = require("fs/promises");
+;// CONCATENATED MODULE: ./index.js
+
 
 
 
 
 async function run() {
   try {
-    const pat = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)("git-pat");
-    const repo = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)("repo");
-    const ref = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)("ref");
-    const outputDir = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)("output-directory");
+    const pat = (0,core.getInput)("git-pat");
+    const repo = (0,core.getInput)("repo");
+    const ref = (0,core.getInput)("ref");
+    const outputDir = (0,core.getInput)("output-directory");
 
     const options = {
       headers: {},
@@ -2920,7 +2897,13 @@ async function run() {
       };
     }
 
-    for (const include of (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getMultilineInput)("includes")) {
+    if (outputDir) {
+      if (!(0,external_fs_.existsSync)(outputDir)) {
+        await (0,promises_namespaceObject.mkdir)(outputDir);
+      }
+    }
+
+    for (const include of (0,core.getMultilineInput)("includes")) {
       const [input, output] = include.split(":");
       const outputLocation = outputDir ? `${outputDir}/${output}` : output;
       const url = `https://raw.githubusercontent.com/${repo}/${ref}/${input}`;
@@ -2929,9 +2912,9 @@ async function run() {
       console.log(`Downloaded "${input}" to "${downloadLocation}".`);
     }
 
-    console.log(`Files: ${(0,fs__WEBPACK_IMPORTED_MODULE_2__.readdirSync)(outputDir)}`);
+    console.log(`Files: ${await (0,promises_namespaceObject.readdir)(outputDir)}`);
 
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.summary.addHeading("Summary")
+    core.summary.addHeading("Summary")
       .addTable([
         [
           { data: "Description", header: true },
@@ -2942,15 +2925,15 @@ async function run() {
       ])
       .write();
   } catch (error) {
-    (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed)(error.message);
+    (0,core.setFailed)(error.message);
   }
 }
 
 async function download(url, options, output) {
   return new Promise((resolve, reject) => {
-    const fileStream = (0,fs__WEBPACK_IMPORTED_MODULE_2__.createWriteStream)(output);
+    const fileStream = (0,external_fs_.createWriteStream)(output);
 
-    (0,https__WEBPACK_IMPORTED_MODULE_1__.get)(url, options, (res) => {
+    (0,external_https_.get)(url, options, (res) => {
       res.pipe(fileStream);
 
       fileStream.on("finish", () => {

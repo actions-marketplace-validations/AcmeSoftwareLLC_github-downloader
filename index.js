@@ -1,6 +1,7 @@
 import { getInput, getMultilineInput, setFailed, summary } from "@actions/core";
 import { get } from "https";
-import { createWriteStream, readdirSync } from "fs";
+import { createWriteStream, existsSync } from "fs";
+import { readdir, mkdir } from "fs/promises";
 
 async function run() {
   try {
@@ -19,6 +20,12 @@ async function run() {
       };
     }
 
+    if (outputDir) {
+      if (!existsSync(outputDir)) {
+        await mkdir(outputDir);
+      }
+    }
+
     for (const include of getMultilineInput("includes")) {
       const [input, output] = include.split(":");
       const outputLocation = outputDir ? `${outputDir}/${output}` : output;
@@ -28,7 +35,7 @@ async function run() {
       console.log(`Downloaded "${input}" to "${downloadLocation}".`);
     }
 
-    console.log(`Files: ${readdirSync(outputDir)}`);
+    console.log(`Files: ${await readdir(outputDir)}`);
 
     summary
       .addHeading("Summary")
