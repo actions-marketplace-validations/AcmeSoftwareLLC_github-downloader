@@ -19,4 +19,5 @@ jobs:
           repo: creativetimofficial/public-assets
           includes: |
             argon-pro-flutter/chat-screen.jpg:app/screen.jpg
+            argon-pro-flutter/beauty-screen.jpg:next/beauty.jpg
           output-directory: downloads

@@ -2914,7 +2914,9 @@ async function run() {
       console.log(`Downloaded "${input}" to "${downloadLocation}".`);
     }
 
-    console.log(`Files: ${await (0,promises_namespaceObject.readdir)(outputDir)}`);
+    console.log(
+      `Downloaded Files: ${await (0,promises_namespaceObject.readdir)(outputDir, (recursive = true))}`
+    );
 
     core.summary.addHeading("Summary")
       .addTable([

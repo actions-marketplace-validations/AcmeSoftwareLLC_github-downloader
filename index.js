@@ -35,7 +35,9 @@ async function run() {
       console.log(`Downloaded "${input}" to "${downloadLocation}".`);
     }
 
-    console.log(`Files: ${await readdir(outputDir)}`);
+    console.log(
+      `Downloaded Files: ${await readdir(outputDir, (recursive = true))}`
+    );
 
     summary
       .addHeading("Summary")
