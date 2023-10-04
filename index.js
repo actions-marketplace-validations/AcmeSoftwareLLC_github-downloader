@@ -2,6 +2,7 @@ import { getInput, getMultilineInput, setFailed, summary } from "@actions/core";
 import { get } from "https";
 import { createWriteStream, existsSync } from "fs";
 import { readdir, mkdir } from "fs/promises";
+import { dirname } from "path";
 
 async function run() {
   try {
@@ -20,16 +21,15 @@ async function run() {
       };
     }
 
-    if (outputDir) {
-      if (!existsSync(outputDir)) {
-        await mkdir(outputDir);
-      }
-    }
-
     for (const include of getMultilineInput("includes")) {
       const [input, output] = include.split(":");
       const outputLocation = outputDir ? `${outputDir}/${output}` : output;
       const url = `https://raw.githubusercontent.com/${repo}/${ref}/${input}`;
+
+      const dir = dirname(outputLocation);
+      if (!existsSync(dir)) {
+        await mkdir(dir, { recursive: true });
+      }
 
       const downloadLocation = await download(url, options, outputLocation);
       console.log(`Downloaded "${input}" to "${downloadLocation}".`);

@@ -2874,7 +2874,10 @@ var external_https_ = __nccwpck_require__(687);
 var external_fs_ = __nccwpck_require__(147);
 ;// CONCATENATED MODULE: external "fs/promises"
 const promises_namespaceObject = require("fs/promises");
+// EXTERNAL MODULE: external "path"
+var external_path_ = __nccwpck_require__(17);
 ;// CONCATENATED MODULE: ./index.js
+
 
 
 
@@ -2897,16 +2900,15 @@ async function run() {
       };
     }
 
-    if (outputDir) {
-      if (!(0,external_fs_.existsSync)(outputDir)) {
-        await (0,promises_namespaceObject.mkdir)(outputDir);
-      }
-    }
-
     for (const include of (0,core.getMultilineInput)("includes")) {
       const [input, output] = include.split(":");
       const outputLocation = outputDir ? `${outputDir}/${output}` : output;
       const url = `https://raw.githubusercontent.com/${repo}/${ref}/${input}`;
+
+      const dir = (0,external_path_.dirname)(outputLocation);
+      if (!(0,external_fs_.existsSync)(dir)) {
+        await (0,promises_namespaceObject.mkdir)(dir, { recursive: true });
+      }
 
       const downloadLocation = await download(url, options, outputLocation);
       console.log(`Downloaded "${input}" to "${downloadLocation}".`);
