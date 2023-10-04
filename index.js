@@ -19,6 +19,8 @@ async function run() {
       };
     }
 
+    console.log(`Test: ${getMultilineInput("includes")}`);
+
     for (const include of getMultilineInput("includes")) {
       const [input, output] = include.split(":");
       const outputLocation = outputDir ? `${outputDir}/${output}` : output;

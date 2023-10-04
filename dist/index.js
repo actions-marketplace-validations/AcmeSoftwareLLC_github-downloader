@@ -2920,6 +2920,8 @@ async function run() {
       };
     }
 
+    console.log(`Test: ${(0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getMultilineInput)("includes")}`);
+
     for (const include of (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getMultilineInput)("includes")) {
       const [input, output] = include.split(":");
       const outputLocation = outputDir ? `${outputDir}/${output}` : output;
