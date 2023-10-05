@@ -74,6 +74,8 @@ async function getFiles(directory) {
   const files = await readdir(directory, { recursive: true });
 
   return files.filter((file) => {
+    console.log(file);
+    console.log(statSync(`${directory}/${file}`).isFile());
     return statSync(`${directory}/${file}`).isFile();
   });
 }

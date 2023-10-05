@@ -2952,6 +2952,8 @@ async function getFiles(directory) {
   const files = await (0,promises_namespaceObject.readdir)(directory, { recursive: true });
 
   return files.filter((file) => {
+    console.log(file);
+    console.log((0,external_fs_.statSync)(`${directory}/${file}`).isFile());
     return (0,external_fs_.statSync)(`${directory}/${file}`).isFile();
   });
 }
