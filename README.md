@@ -6,10 +6,14 @@ This action downloads the file from provided Github repository.
 
 ```yaml
 steps:
-  - name: Prepare the resources for signing
+  - name: Prepare the resources for signing Android app
     uses: AcmeSoftwareLLC/github-downloader@v1
     with:
       git-pat: ${{ secrets.GIT_PAT }}
-      repo: org/repo
+      repo: org/reponame
       ref: main
+      includes: |
+        android/key.jks:app/app/key.jks
+        android/key.properties:key.properties
+      output-directory: android
 ```

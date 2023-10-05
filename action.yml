@@ -1,4 +1,4 @@
-name: Github Downloader
+name: Raw Github Downloader
 description: Download files from Github
 inputs:
   includes:

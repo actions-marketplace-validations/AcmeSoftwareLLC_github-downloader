@@ -46,7 +46,7 @@ async function run() {
         ],
         ["Repo", repo],
         ["Ref", ref],
-        ["Downloaded Files", downloadedFiles],
+        ["Downloaded Files", `${outputDir}:\n${downloadedFiles}`],
       ])
       .write();
   } catch (error) {
@@ -79,7 +79,7 @@ async function getFiles(directory) {
       console.log(statSync(`${directory}/${file}`).isFile());
       return statSync(`${directory}/${file}`).isFile();
     })
-    .join(", ");
+    .join("\n");
 }
 
 run();
