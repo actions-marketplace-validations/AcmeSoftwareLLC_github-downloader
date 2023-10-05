@@ -2914,7 +2914,7 @@ async function run() {
       console.log(`Downloaded "${input}" to "${downloadLocation}".`);
     }
 
-    const downloadedFiles = listFiles(outputDir);
+    const downloadedFiles = await getFiles(outputDir);
 
     core.summary.addHeading("Summary")
       .addTable([
@@ -2948,18 +2948,11 @@ async function download(url, options, output) {
   });
 }
 
-function listFiles(directory) {
-  (0,promises_namespaceObject.readdir)(directory, (err, files) => {
-    if (err) {
-      console.error(err);
-      return;
-    }
+async function getFiles(directory) {
+  const files = await (0,promises_namespaceObject.readdir)(directory, { recursive: true });
 
-    const filesOnly = files.filter((file) => {
-      return (0,external_fs_.statSync)(`${directory}/${file}`).isFile();
-    });
-
-    return filesOnly;
+  return files.filter((file) => {
+    return (0,external_fs_.statSync)(`${directory}/${file}`).isFile();
   });
 }
 
