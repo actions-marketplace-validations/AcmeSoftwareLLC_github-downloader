@@ -75,11 +75,9 @@ async function getFiles(directory) {
 
   return files
     .filter((file) => {
-      console.log(file);
-      console.log(statSync(`${directory}/${file}`).isFile());
       return statSync(`${directory}/${file}`).isFile();
     })
-    .join("\n");
+    .join(", ");
 }
 
 run();

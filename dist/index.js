@@ -2953,11 +2953,9 @@ async function getFiles(directory) {
 
   return files
     .filter((file) => {
-      console.log(file);
-      console.log((0,external_fs_.statSync)(`${directory}/${file}`).isFile());
       return (0,external_fs_.statSync)(`${directory}/${file}`).isFile();
     })
-    .join("\n");
+    .join(", ");
 }
 
 run();
