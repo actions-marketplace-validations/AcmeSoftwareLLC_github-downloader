@@ -1,44 +1,46 @@
 import { getInput, getMultilineInput, setFailed, summary } from "@actions/core";
 import { get } from "https";
-import { createWriteStream, existsSync, read, statSync } from "fs";
-import { readdir, mkdir } from "fs/promises";
-import { dirname } from "path";
+import { createWriteStream } from "fs";
+import { mkdir, readdir, stat } from "fs/promises";
+import { dirname, join } from "path";
 
 async function run() {
   try {
     const pat = getInput("git-pat");
-    const repo = getInput("repo");
-    const ref = getInput("ref");
+    const repo = getInput("repo", { required: true });
+    const ref = getInput("ref") || "main";
     const outputDir = getInput("output-directory");
+    const includes = getMultilineInput("includes");
 
-    const options = {
-      headers: {},
-    };
-
-    if (pat) {
-      options.headers = {
-        Authorization: `token ${pat}`,
-      };
+    if (!includes.length) {
+      throw new Error("No files specified in 'includes'.");
     }
 
-    for (const include of getMultilineInput("includes")) {
+    const options = pat ? { headers: { Authorization: `token ${pat}` } } : {};
+
+    const downloads = includes.map(async (include) => {
       const [input, output] = include.split(":");
-      const outputLocation = outputDir ? `${outputDir}/${output}` : output;
+      if (!output) {
+        throw new Error(
+          `Invalid 'includes' format: "${include}". Expected format is "source:destination".`
+        );
+      }
+      const outputLocation = outputDir ? join(outputDir, output) : output;
       const url = `https://raw.githubusercontent.com/${repo}/${ref}/${input}`;
 
-      const dir = dirname(outputLocation);
-      if (!existsSync(dir)) {
-        await mkdir(dir, { recursive: true });
-      }
+      await mkdir(dirname(outputLocation), { recursive: true });
+      await download(url, options, outputLocation);
 
-      const downloadLocation = await download(url, options, outputLocation);
-      console.log(`Downloaded "${input}" to "${downloadLocation}".`);
-    }
+      console.log(`✅ Downloaded "${input}" → "${outputLocation}"`);
+      return outputLocation;
+    });
 
-    const downloadedFiles = await getFiles(outputDir);
+    const downloadedFiles = await Promise.all(downloads);
 
-    summary
-      .addHeading("Summary")
+    const allFiles = outputDir ? await getFiles(outputDir) : downloadedFiles;
+
+    await summary
+      .addHeading("Download Summary")
       .addTable([
         [
           { data: "Description", header: true },
@@ -46,38 +48,56 @@ async function run() {
         ],
         ["Repo", repo],
         ["Ref", ref],
-        ["Downloaded Files", `${outputDir}:\n${downloadedFiles}`],
+        ["Downloaded Files", downloadedFiles.join("\n")],
+        ...(outputDir ? [["All Files in Output", allFiles.join("\n")]] : []),
       ])
       .write();
   } catch (error) {
-    setFailed(error.message);
+    setFailed(error instanceof Error ? error.message : String(error));
   }
 }
 
 async function download(url, options, output) {
   return new Promise((resolve, reject) => {
     const fileStream = createWriteStream(output);
+    fileStream.on("error", reject);
 
-    get(url, options, (res) => {
+    const req = get(url, options, (res) => {
+      if (res.statusCode && res.statusCode >= 400) {
+        res.resume();
+        return reject(
+          new Error(`Failed to download ${url} (status ${res.statusCode})`)
+        );
+      }
+
       res.pipe(fileStream);
 
       fileStream.on("finish", () => {
-        resolve(output);
+        fileStream.close((err) => {
+          if (err) {
+            return reject(err);
+          }
+          resolve();
+        });
       });
-    }).on("error", (err) => {
-      reject(err);
+    });
+
+    req.on("error", reject);
+
+    req.setTimeout(15000, () => {
+      req.destroy(new Error(`Request timed out for ${url}`));
     });
   });
 }
 
 async function getFiles(directory) {
-  const files = await readdir(directory, { recursive: true });
-
-  return files
-    .filter((file) => {
-      return statSync(`${directory}/${file}`).isFile();
-    })
-    .join(", ");
+  const dirents = await readdir(directory, {
+    recursive: true,
+    withFileTypes: true,
+  });
+  return dirents
+    .filter((dirent) => dirent.isFile())
+    .map((dirent) => join(directory, dirent.name));
 }
 
 run();
