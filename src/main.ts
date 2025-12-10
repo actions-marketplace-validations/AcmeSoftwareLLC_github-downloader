@@ -67,11 +67,6 @@ async function downloadMappedFiles(
 		const outputPath = join(outputDir, destination);
 		const dirPath = dirname(outputPath);
 
-		if (dirPath && !existsSync(dirPath)) {
-			console.log(`Creating directory: ${dirPath}`);
-			await mkdirP(dirPath);
-		}
-
 		try {
 			const { data, status } = await octokit.rest.repos.getContent({
 				owner: owner,
@@ -82,6 +77,11 @@ async function downloadMappedFiles(
 			});
 			if (status !== 200 || typeof data !== "string") {
 				throw new Error(`Failed to download ${source} (status ${status})`);
+			}
+
+			if (dirPath && !existsSync(dirPath)) {
+				console.log(`Creating directory: ${dirPath}`);
+				await mkdirP(dirPath);
 			}
 
 			await writeFile(outputPath, data);

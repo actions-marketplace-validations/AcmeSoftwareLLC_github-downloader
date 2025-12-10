@@ -53991,10 +53991,6 @@ async function downloadMappedFiles(mappings, { owner, repo, ref, token, outputDi
         const [source, destination] = mapping;
         const outputPath = join(outputDir, destination);
         const dirPath = dirname(outputPath);
-        if (dirPath && !existsSync(dirPath)) {
-            console.log(`Creating directory: ${dirPath}`);
-            await ioExports.mkdirP(dirPath);
-        }
         try {
             const { data, status } = await octokit.rest.repos.getContent({
                 owner: owner,
@@ -54005,6 +54001,10 @@ async function downloadMappedFiles(mappings, { owner, repo, ref, token, outputDi
             });
             if (status !== 200 || typeof data !== "string") {
                 throw new Error(`Failed to download ${source} (status ${status})`);
+            }
+            if (dirPath && !existsSync(dirPath)) {
+                console.log(`Creating directory: ${dirPath}`);
+                await ioExports.mkdirP(dirPath);
             }
             await writeFile(outputPath, data);
             await logFileDownload(source, outputPath);

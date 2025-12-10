@@ -12,7 +12,7 @@ jobs:
     name: Successful Download Test
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Download existing files
         id: download
@@ -37,13 +37,13 @@ jobs:
   download-failure:
     runs-on: ubuntu-latest
     name: Failure Download Test
-    continue-on-error: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Download non-existent file
         id: download_step
+        continue-on-error: true
         uses: ./
         with:
           owner: creativetimofficial
