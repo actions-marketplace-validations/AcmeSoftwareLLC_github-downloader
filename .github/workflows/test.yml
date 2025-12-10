@@ -15,6 +15,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Download existing files
+        id: download
         uses: ./
         with:
           owner: creativetimofficial
@@ -26,6 +27,11 @@ jobs:
               "argon-pro-flutter/beauty-screen.jpg": "next/beauty.jpg"
             }
           output-directory: downloads
+
+      - name: Print downloaded files
+        run: |
+          echo "✅ Downloaded files:"
+          echo "${{ steps.download.outputs.files }}"
 
   download-failure:
     runs-on: ubuntu-latest
