@@ -2,6 +2,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { getInput, getMultilineInput, setFailed, summary } from "@actions/core";
 import { getOctokit } from "@actions/github";
+import { RequestError } from "@octokit/request-error";
 import {
 	type FileMapping,
 	getFiles,
@@ -56,19 +57,36 @@ async function downloadMappedFiles(
 		const [source, destination] = mapping;
 		const outputPath = join(outputDir, destination);
 
-		const { data, status } = await octokit.rest.repos.getContent({
-			owner: owner,
-			repo: repo,
-			path: source,
-			ref: ref,
-			mediaType: { format: "raw" },
-		});
-		if (status !== 200 || typeof data !== "string") {
-			throw new Error(`Failed to download ${source} (status ${status})`);
-		}
+		try {
+			const { data, status } = await octokit.rest.repos.getContent({
+				owner: owner,
+				repo: repo,
+				path: source,
+				ref: ref,
+				mediaType: { format: "raw" },
+			});
+			if (status !== 200 || typeof data !== "string") {
+				throw new Error(`Failed to download ${source} (status ${status})`);
+			}
 
-		await writeFile(outputPath, data);
-		logFileDownload(source, outputPath);
+			await writeFile(outputPath, data);
+			await logFileDownload(source, outputPath);
+		} catch (error) {
+			if (error instanceof RequestError) {
+				// handle Octokit error
+				console.error(
+					`[Octokit Error] ${error.message} (status: ${error.status})`,
+				);
+			} else if (error instanceof Error) {
+				// handle other errors
+				console.error(`[Unexpected Error] ${error}`);
+				throw error;
+			} else {
+				// handle non-Error objects
+				console.error(`[Unknown Error]`, error);
+				throw error;
+			}
+		}
 		return outputPath;
 	}
 

@@ -2,6 +2,7 @@ import { createRequire } from "node:module";
 import { mkdir, readdir, stat, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { getInput, getMultilineInput, setFailed, summary } from "@actions/core";
+import { RequestError } from "@octokit/request-error";
 
 //#region rolldown:runtime
 var __commonJSMin = (cb, mod) => () => (mod || cb((mod = { exports: {} }).exports, mod), mod.exports);
@@ -27212,7 +27213,7 @@ var require_utils$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 
 //#endregion
 //#region node_modules/@actions/github/node_modules/universal-user-agent/dist-node/index.js
-var require_dist_node$11 = /* @__PURE__ */ __commonJSMin(((exports) => {
+var require_dist_node$9 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	function getUserAgent$2() {
 		if (typeof navigator === "object" && "userAgent" in navigator) return navigator.userAgent;
@@ -27343,7 +27344,7 @@ var require_before_after_hook = /* @__PURE__ */ __commonJSMin(((exports, module)
 
 //#endregion
 //#region node_modules/@octokit/endpoint/node_modules/universal-user-agent/dist-node/index.js
-var require_dist_node$10 = /* @__PURE__ */ __commonJSMin(((exports) => {
+var require_dist_node$8 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	function getUserAgent$1() {
 		if (typeof navigator === "object" && "userAgent" in navigator) return navigator.userAgent;
@@ -27355,31 +27356,31 @@ var require_dist_node$10 = /* @__PURE__ */ __commonJSMin(((exports) => {
 
 //#endregion
 //#region node_modules/@octokit/endpoint/dist-node/index.js
-var require_dist_node$9 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var __defProp$7 = Object.defineProperty;
-	var __getOwnPropDesc$7 = Object.getOwnPropertyDescriptor;
-	var __getOwnPropNames$7 = Object.getOwnPropertyNames;
-	var __hasOwnProp$7 = Object.prototype.hasOwnProperty;
-	var __export$7 = (target, all) => {
-		for (var name in all) __defProp$7(target, name, {
+var require_dist_node$7 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	var __defProp$6 = Object.defineProperty;
+	var __getOwnPropDesc$6 = Object.getOwnPropertyDescriptor;
+	var __getOwnPropNames$6 = Object.getOwnPropertyNames;
+	var __hasOwnProp$6 = Object.prototype.hasOwnProperty;
+	var __export$6 = (target, all) => {
+		for (var name in all) __defProp$6(target, name, {
 			get: all[name],
 			enumerable: true
 		});
 	};
-	var __copyProps$7 = (to, from, except, desc) => {
+	var __copyProps$6 = (to, from, except, desc) => {
 		if (from && typeof from === "object" || typeof from === "function") {
-			for (let key of __getOwnPropNames$7(from)) if (!__hasOwnProp$7.call(to, key) && key !== except) __defProp$7(to, key, {
+			for (let key of __getOwnPropNames$6(from)) if (!__hasOwnProp$6.call(to, key) && key !== except) __defProp$6(to, key, {
 				get: () => from[key],
-				enumerable: !(desc = __getOwnPropDesc$7(from, key)) || desc.enumerable
+				enumerable: !(desc = __getOwnPropDesc$6(from, key)) || desc.enumerable
 			});
 		}
 		return to;
 	};
-	var __toCommonJS$7 = (mod) => __copyProps$7(__defProp$7({}, "__esModule", { value: true }), mod);
-	var dist_src_exports$5 = {};
-	__export$7(dist_src_exports$5, { endpoint: () => endpoint });
-	module.exports = __toCommonJS$7(dist_src_exports$5);
-	var userAgent = `octokit-endpoint.js/9.0.6 ${(0, require_dist_node$10().getUserAgent)()}`;
+	var __toCommonJS$6 = (mod) => __copyProps$6(__defProp$6({}, "__esModule", { value: true }), mod);
+	var dist_src_exports$4 = {};
+	__export$6(dist_src_exports$4, { endpoint: () => endpoint });
+	module.exports = __toCommonJS$6(dist_src_exports$4);
+	var userAgent = `octokit-endpoint.js/9.0.6 ${(0, require_dist_node$8().getUserAgent)()}`;
 	var DEFAULTS = {
 		method: "GET",
 		baseUrl: "https://api.github.com",
@@ -27602,7 +27603,7 @@ var require_dist_node$9 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 
 //#endregion
 //#region node_modules/@octokit/request/node_modules/universal-user-agent/dist-node/index.js
-var require_dist_node$8 = /* @__PURE__ */ __commonJSMin(((exports) => {
+var require_dist_node$6 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	function getUserAgent() {
 		if (typeof navigator === "object" && "userAgent" in navigator) return navigator.userAgent;
@@ -27610,150 +27611,6 @@ var require_dist_node$8 = /* @__PURE__ */ __commonJSMin(((exports) => {
 		return "<environment undetectable>";
 	}
 	exports.getUserAgent = getUserAgent;
-}));
-
-//#endregion
-//#region node_modules/deprecation/dist-node/index.js
-var require_dist_node$7 = /* @__PURE__ */ __commonJSMin(((exports) => {
-	Object.defineProperty(exports, "__esModule", { value: true });
-	var Deprecation = class extends Error {
-		constructor(message) {
-			super(message);
-			/* istanbul ignore next */
-			if (Error.captureStackTrace) Error.captureStackTrace(this, this.constructor);
-			this.name = "Deprecation";
-		}
-	};
-	exports.Deprecation = Deprecation;
-}));
-
-//#endregion
-//#region node_modules/wrappy/wrappy.js
-var require_wrappy = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	module.exports = wrappy$1;
-	function wrappy$1(fn, cb) {
-		if (fn && cb) return wrappy$1(fn)(cb);
-		if (typeof fn !== "function") throw new TypeError("need wrapper function");
-		Object.keys(fn).forEach(function(k) {
-			wrapper[k] = fn[k];
-		});
-		return wrapper;
-		function wrapper() {
-			var args = new Array(arguments.length);
-			for (var i = 0; i < args.length; i++) args[i] = arguments[i];
-			var ret = fn.apply(this, args);
-			var cb$1 = args[args.length - 1];
-			if (typeof ret === "function" && ret !== cb$1) Object.keys(cb$1).forEach(function(k) {
-				ret[k] = cb$1[k];
-			});
-			return ret;
-		}
-	}
-}));
-
-//#endregion
-//#region node_modules/once/once.js
-var require_once = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var wrappy = require_wrappy();
-	module.exports = wrappy(once);
-	module.exports.strict = wrappy(onceStrict);
-	once.proto = once(function() {
-		Object.defineProperty(Function.prototype, "once", {
-			value: function() {
-				return once(this);
-			},
-			configurable: true
-		});
-		Object.defineProperty(Function.prototype, "onceStrict", {
-			value: function() {
-				return onceStrict(this);
-			},
-			configurable: true
-		});
-	});
-	function once(fn) {
-		var f = function() {
-			if (f.called) return f.value;
-			f.called = true;
-			return f.value = fn.apply(this, arguments);
-		};
-		f.called = false;
-		return f;
-	}
-	function onceStrict(fn) {
-		var f = function() {
-			if (f.called) throw new Error(f.onceError);
-			f.called = true;
-			return f.value = fn.apply(this, arguments);
-		};
-		f.onceError = (fn.name || "Function wrapped with `once`") + " shouldn't be called more than once";
-		f.called = false;
-		return f;
-	}
-}));
-
-//#endregion
-//#region node_modules/@octokit/request-error/dist-node/index.js
-var require_dist_node$6 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var __create = Object.create;
-	var __defProp$6 = Object.defineProperty;
-	var __getOwnPropDesc$6 = Object.getOwnPropertyDescriptor;
-	var __getOwnPropNames$6 = Object.getOwnPropertyNames;
-	var __getProtoOf = Object.getPrototypeOf;
-	var __hasOwnProp$6 = Object.prototype.hasOwnProperty;
-	var __export$6 = (target, all) => {
-		for (var name in all) __defProp$6(target, name, {
-			get: all[name],
-			enumerable: true
-		});
-	};
-	var __copyProps$6 = (to, from, except, desc) => {
-		if (from && typeof from === "object" || typeof from === "function") {
-			for (let key of __getOwnPropNames$6(from)) if (!__hasOwnProp$6.call(to, key) && key !== except) __defProp$6(to, key, {
-				get: () => from[key],
-				enumerable: !(desc = __getOwnPropDesc$6(from, key)) || desc.enumerable
-			});
-		}
-		return to;
-	};
-	var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps$6(isNodeMode || !mod || !mod.__esModule ? __defProp$6(target, "default", {
-		value: mod,
-		enumerable: true
-	}) : target, mod));
-	var __toCommonJS$6 = (mod) => __copyProps$6(__defProp$6({}, "__esModule", { value: true }), mod);
-	var dist_src_exports$4 = {};
-	__export$6(dist_src_exports$4, { RequestError: () => RequestError });
-	module.exports = __toCommonJS$6(dist_src_exports$4);
-	var import_deprecation = require_dist_node$7();
-	var import_once = __toESM(require_once());
-	var logOnceCode = (0, import_once.default)((deprecation) => console.warn(deprecation));
-	var logOnceHeaders = (0, import_once.default)((deprecation) => console.warn(deprecation));
-	var RequestError = class extends Error {
-		constructor(message, statusCode, options) {
-			super(message);
-			if (Error.captureStackTrace) Error.captureStackTrace(this, this.constructor);
-			this.name = "HttpError";
-			this.status = statusCode;
-			let headers;
-			if ("headers" in options && typeof options.headers !== "undefined") headers = options.headers;
-			if ("response" in options) {
-				this.response = options.response;
-				headers = options.response.headers;
-			}
-			const requestCopy = Object.assign({}, options.request);
-			if (options.request.headers.authorization) requestCopy.headers = Object.assign({}, options.request.headers, { authorization: options.request.headers.authorization.replace(/(?<! ) .*$/, " [REDACTED]") });
-			requestCopy.url = requestCopy.url.replace(/\bclient_secret=\w+/g, "client_secret=[REDACTED]").replace(/\baccess_token=\w+/g, "access_token=[REDACTED]");
-			this.request = requestCopy;
-			Object.defineProperty(this, "code", { get() {
-				logOnceCode(new import_deprecation.Deprecation("[@octokit/request-error] `error.code` is deprecated, use `error.status`."));
-				return statusCode;
-			} });
-			Object.defineProperty(this, "headers", { get() {
-				logOnceHeaders(new import_deprecation.Deprecation("[@octokit/request-error] `error.headers` is deprecated, use `error.response.headers`."));
-				return headers || {};
-			} });
-		}
-	};
 }));
 
 //#endregion
@@ -27782,8 +27639,8 @@ var require_dist_node$5 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var dist_src_exports$3 = {};
 	__export$5(dist_src_exports$3, { request: () => request });
 	module.exports = __toCommonJS$5(dist_src_exports$3);
-	var import_endpoint = require_dist_node$9();
-	var import_universal_user_agent$2 = require_dist_node$8();
+	var import_endpoint = require_dist_node$7();
+	var import_universal_user_agent$2 = require_dist_node$6();
 	var VERSION$4 = "8.4.1";
 	function isPlainObject(value) {
 		if (typeof value !== "object" || value === null) return false;
@@ -27793,7 +27650,7 @@ var require_dist_node$5 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 		const Ctor = Object.prototype.hasOwnProperty.call(proto, "constructor") && proto.constructor;
 		return typeof Ctor === "function" && Ctor instanceof Ctor && Function.prototype.call(Ctor) === Function.prototype.call(value);
 	}
-	var import_request_error = require_dist_node$6();
+	var import_request_error = __require("@octokit/request-error");
 	function getBufferResponse(response) {
 		return response.arrayBuffer();
 	}
@@ -27947,7 +27804,7 @@ var require_dist_node$4 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	});
 	module.exports = __toCommonJS$4(index_exports$1);
 	var import_request3 = require_dist_node$5();
-	var import_universal_user_agent$1 = require_dist_node$11();
+	var import_universal_user_agent$1 = require_dist_node$9();
 	var VERSION$3 = "7.1.1";
 	require_dist_node$5();
 	require_dist_node$5();
@@ -28116,7 +27973,7 @@ var require_dist_node$2 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var index_exports = {};
 	__export$2(index_exports, { Octokit: () => Octokit });
 	module.exports = __toCommonJS$2(index_exports);
-	var import_universal_user_agent = require_dist_node$11();
+	var import_universal_user_agent = require_dist_node$9();
 	var import_before_after_hook = require_before_after_hook();
 	var import_request = require_dist_node$5();
 	var import_graphql = require_dist_node$4();
@@ -30045,16 +29902,27 @@ async function downloadMappedFiles(mappings, { owner, repo, ref, token, outputDi
 	async function downloadSingleFile(mapping) {
 		const [source, destination] = mapping;
 		const outputPath = join(outputDir, destination);
-		const { data, status } = await octokit.rest.repos.getContent({
-			owner,
-			repo,
-			path: source,
-			ref,
-			mediaType: { format: "raw" }
-		});
-		if (status !== 200 || typeof data !== "string") throw new Error(`Failed to download ${source} (status ${status})`);
-		await writeFile(outputPath, data);
-		logFileDownload(source, outputPath);
+		try {
+			const { data, status } = await octokit.rest.repos.getContent({
+				owner,
+				repo,
+				path: source,
+				ref,
+				mediaType: { format: "raw" }
+			});
+			if (status !== 200 || typeof data !== "string") throw new Error(`Failed to download ${source} (status ${status})`);
+			await writeFile(outputPath, data);
+			await logFileDownload(source, outputPath);
+		} catch (error) {
+			if (error instanceof RequestError) console.error(`[Octokit Error] ${error.message} (status: ${error.status})`);
+			else if (error instanceof Error) {
+				console.error(`[Unexpected Error] ${error}`);
+				throw error;
+			} else {
+				console.error(`[Unknown Error]`, error);
+				throw error;
+			}
+		}
 		return outputPath;
 	}
 	return Promise.all(mappings.map(downloadSingleFile));
