@@ -8,8 +8,8 @@
 	"scripts": {
 		"bundle": "npm run format && npm run package",
 		"format": "npx @biomejs/biome check --write",
-		"package": "rolldown -c",
-		"package:watch": "rolldown -w -c",
+		"package": "npx rimraf ./dist && npx rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript",
+		"package:watch": "npm run package -- --watch",
 		"local-action": "npx @github/local-action . src/main.ts .env",
 		"lint": "npx @biomejs/biome lint"
 	},
@@ -37,8 +37,7 @@
 		"@biomejs/biome": "2.3.8",
 		"@github/local-action": "^6.0.2",
 		"@types/node": "^24.10.2",
-		"rolldown": "^1.0.0-beta.53",
-		"tsdown": "^0.17.2",
+		"rollup": "^4.53.3",
 		"typescript": "^5.9.3"
 	}
 }
