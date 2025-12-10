@@ -6,6 +6,7 @@ import {
 	download,
 	type FileMapping,
 	getFiles,
+	logFileDownload,
 	parseMappings,
 } from "./utils.js";
 
@@ -23,22 +24,17 @@ export async function run(): Promise<void> {
 		const props = { repo, ref, options, outputDir };
 
 		const downloadedFiles = await downloadMappedFiles(mappings, props);
+		const allFiles = await getFiles(outputDir);
 
-		const allFiles = outputDir ? await getFiles(outputDir) : downloadedFiles;
-
-		await summary
-			.addHeading("Download Summary")
-			.addTable([
-				[
-					{ data: "Description", header: true },
-					{ data: "Result", header: true },
-				],
-				["Repo", repo],
-				["Ref", ref],
-				["Downloaded Files", downloadedFiles.join("\n")],
-				...(outputDir ? [["All Files in Output", allFiles.join("\n")]] : []),
-			])
-			.write();
+		await writeSummary({
+			downloadedFiles: mappings.map((mapping, index) => [
+				mapping[0],
+				downloadedFiles[index],
+			]),
+			repo,
+			ref,
+			allFiles,
+		});
 	} catch (error) {
 		setFailed(error instanceof Error ? error.message : String(error));
 	}
@@ -56,16 +52,60 @@ async function downloadMappedFiles(
 	{ repo, ref, options, outputDir }: DownloadProps,
 ): Promise<string[]> {
 	async function downloadSingleFile(mapping: FileMapping): Promise<string> {
-		const [input, output] = mapping;
-		const outputLocation = outputDir ? join(outputDir, output) : output;
-		const url = `https://raw.githubusercontent.com/${repo}/${ref}/${input}`;
+		const [source, destination] = mapping;
+		const outputPath = outputDir ? join(outputDir, destination) : destination;
+		const url = `https://raw.githubusercontent.com/${repo}/${ref}/${source}`;
 
-		await mkdir(dirname(outputLocation), { recursive: true });
-		await download(url, options, outputLocation);
+		await mkdir(dirname(outputPath), { recursive: true });
+		await download(url, options, outputPath);
+		await logFileDownload(source, outputPath);
 
-		console.log(`✅ Downloaded "${input}" → "${outputLocation}"`);
-		return outputLocation;
+		return outputPath;
 	}
 
 	return Promise.all(mappings.map(downloadSingleFile));
+}
+
+interface SummaryData {
+	allFiles: string[];
+	downloadedFiles: FileMapping[];
+	ref: string;
+	repo: string;
+}
+
+async function writeSummary({
+	allFiles,
+	downloadedFiles,
+	ref,
+	repo,
+}: SummaryData): Promise<void> {
+	let summaryWriter = summary
+		.addHeading("📦 GitHub Downloader Action Summary")
+		.addBreak()
+		.addRaw(`**Repository:** ${repo}`)
+		.addBreak()
+		.addRaw(`**Branch:** ${ref}`)
+		.addSeparator()
+		.addHeading("Downloaded Files", 2)
+		.addTable([
+			[
+				{ data: "Source Path", header: true },
+				{ data: "Saved As", header: true },
+			],
+			...downloadedFiles,
+		])
+		.addSeparator()
+		.addHeading("Output Directory Files", 2);
+
+	if (allFiles) {
+		for (const file of allFiles) {
+			summaryWriter = summaryWriter.addBreak().addRaw(`- ${file}`);
+		}
+	} else {
+		summaryWriter = summaryWriter
+			.addBreak()
+			.addRaw("_No files found in output directory._");
+	}
+
+	await summaryWriter.write();
 }

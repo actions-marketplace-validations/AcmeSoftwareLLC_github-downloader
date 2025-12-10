@@ -1,5 +1,5 @@
 import { createWriteStream, type Dirent } from "node:fs";
-import { readdir } from "node:fs/promises";
+import { readdir, stat } from "node:fs/promises";
 import { get, type RequestOptions } from "node:https";
 import { join } from "node:path";
 
@@ -8,10 +8,10 @@ export type FileMapping = [string, string];
 async function download(
 	url: string,
 	options: RequestOptions,
-	output: string,
+	outputPath: string,
 ): Promise<void> {
 	return new Promise((resolve, reject) => {
-		const fileStream = createWriteStream(output);
+		const fileStream = createWriteStream(outputPath);
 		fileStream.on("error", reject);
 
 		const req = get(url, options, (res) => {
@@ -57,4 +57,20 @@ async function parseMappings(mappings: string[]): Promise<FileMapping[]> {
 	return Object.entries(JSON.parse(mappingStr));
 }
 
-export { download, getFiles, parseMappings };
+async function logFileDownload(
+	input: string,
+	outputPath: string,
+): Promise<void> {
+	const { size } = await stat(outputPath);
+	const sizeStr =
+		size < 1024 ? `${size} bytes` : `${(size / 1024).toFixed(2)} KB`;
+	console.log(
+		`\n📥 File Downloaded!\n` +
+			`   • Source:      \x1b[36m${input}\x1b[0m\n` +
+			`   • Saved as:    \x1b[32m${outputPath}\x1b[0m\n` +
+			`   • Size:        \x1b[33m${sizeStr}\x1b[0m\n` +
+			`----------------------------------------`,
+	);
+}
+
+export { download, getFiles, parseMappings, logFileDownload };
