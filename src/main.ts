@@ -72,19 +72,32 @@ async function downloadMappedFiles(
 			await writeFile(outputPath, data);
 			await logFileDownload(source, outputPath);
 		} catch (error) {
-			if (error instanceof RequestError) {
-				// handle Octokit error
-				console.error(
-					`[Octokit Error] ${error.message} (status: ${error.status})`,
-				);
-			} else if (error instanceof Error) {
-				// handle other errors
-				console.error(`[Unexpected Error] ${error}`);
-				throw error;
+			if (
+				error instanceof RequestError ||
+				error?.constructor?.name === "RequestError"
+			) {
+				const err = error as RequestError;
+				if (err.status === 401) {
+					setFailed(
+						`Unauthorized access when trying to download ${source}. ` +
+							`Please check if the provided token has contents access permissions.`,
+					);
+				} else if (err.status === 404) {
+					setFailed(
+						`File not found: ${source}. ` +
+							`Please check if there is a file at https://github.com/${owner}/${repo}/blob/${ref}/${source}`,
+					);
+				} else {
+					setFailed(
+						`Failed to download ${source}: ${err.message} (status: ${err.status})`,
+					);
+				}
 			} else {
-				// handle non-Error objects
-				console.error(`[Unknown Error]`, error);
-				throw error;
+				setFailed(
+					`An unexpected error occurred while downloading ${source}: ${
+						error instanceof Error ? error.message : String(error)
+					}`,
+				);
 			}
 		}
 		return outputPath;
