@@ -4,22 +4,6 @@ import { join } from "node:path";
 
 export type FileMapping = [string, string];
 
-import { createWriteStream } from "node:fs";
-import { pipeline } from "node:stream/promises";
-
-async function download(
-	url: string,
-	headers: Headers,
-	outputPath: string,
-): Promise<void> {
-	const res = await fetch(url, { method: "GET", headers: headers });
-	if (!res.ok || !res.body) {
-		throw new Error(`Failed to download ${url} (status ${res.status})`);
-	}
-	const fileStream = createWriteStream(outputPath);
-	await pipeline(res.body, fileStream);
-}
-
 async function getFiles(directory: string): Promise<string[]> {
 	const dirents: Dirent[] = (await readdir(directory, {
 		recursive: true,
@@ -51,4 +35,4 @@ async function logFileDownload(
 	);
 }
 
-export { download, getFiles, logFileDownload, parseMappings };
+export { getFiles, logFileDownload, parseMappings };

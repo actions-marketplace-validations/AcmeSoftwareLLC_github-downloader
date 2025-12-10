@@ -10,14 +10,18 @@ inputs:
   mappings:
     description: File mappings in JSON format
     required: true
+  owner:
+    description: Github repository owner
+    required: true
   repo:
-    description: Github repository
+    description: Github repository name
     required: true
   ref:
     description: Github branch / reference
     default: main
-  git-pat:
-    description: Github PAT
+  token:
+    description: The repository PAT or GITHUB_TOKEN.
+    required: true
   output-directory:
     description: Output directory
     default: .
