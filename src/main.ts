@@ -1,6 +1,6 @@
+import { mkdir } from "node:fs/promises";
+import { dirname, join } from "node:path";
 import { getInput, getMultilineInput, setFailed, summary } from "@actions/core";
-import { mkdir } from "fs/promises";
-import { dirname, join } from "path";
 import { download, getFiles } from "./utils.js";
 
 export async function run(): Promise<void> {
