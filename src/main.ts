@@ -1,5 +1,6 @@
-import { mkdir, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import { existsSync } from "node:fs";
+import { writeFile } from "node:fs/promises";
+import { dirname, join } from "node:path";
 import {
 	getInput,
 	getMultilineInput,
@@ -8,6 +9,7 @@ import {
 	summary,
 } from "@actions/core";
 import { getOctokit } from "@actions/github";
+import { mkdirP } from "@actions/io";
 import { RequestError } from "@octokit/request-error";
 import {
 	type FileMapping,
@@ -63,9 +65,12 @@ async function downloadMappedFiles(
 	async function downloadSingleFile(mapping: FileMapping): Promise<string> {
 		const [source, destination] = mapping;
 		const outputPath = join(outputDir, destination);
-		const dir = outputPath.substring(0, outputPath.lastIndexOf("/"));
+		const dirPath = dirname(outputPath);
 
-		await mkdir(dir, { recursive: true });
+		if (dirPath && !existsSync(dirPath)) {
+			console.log(`Creating directory: ${dirPath}`);
+			await mkdirP(dirPath);
+		}
 
 		try {
 			const { data, status } = await octokit.rest.repos.getContent({
