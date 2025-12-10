@@ -20,6 +20,7 @@ jobs:
         with:
           owner: creativetimofficial
           repo: public-assets
+          ref: master
           token: ${{ secrets.GITHUB_TOKEN }}
           mappings: |
             {
@@ -47,6 +48,7 @@ jobs:
         with:
           owner: creativetimofficial
           repo: public-assets
+          ref: master
           token: ${{ secrets.GITHUB_TOKEN }}
           mappings: |
             {
