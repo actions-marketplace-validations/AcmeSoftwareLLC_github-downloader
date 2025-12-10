@@ -3,9 +3,9 @@ import { defineConfig } from "rolldown";
 export default defineConfig({
 	input: "src/index.ts",
 	output: {
-		esModule: false,
+		esModule: true,
 		file: "dist/index.js",
-		format: "cjs",
+		format: "esm",
 		sourcemap: true,
 	},
 });
