@@ -2,5 +2,11 @@ import { defineConfig } from "tsdown";
 
 export default defineConfig({
 	entry: ["./src/index.ts"],
-	sourcemap: true,
+	outputOptions: {
+		file: "dist/index.js",
+		dir: undefined,
+		format: "es",
+		sourcemap: true,
+		esModule: true,
+	},
 });
