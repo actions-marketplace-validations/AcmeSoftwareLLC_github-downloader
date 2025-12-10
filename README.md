@@ -1,4 +1,3 @@
-
 # 📥 GitHub Downloader Action
 
 Easily download files from any public or private GitHub repository in your GitHub Actions workflows! 🚀
@@ -14,6 +13,7 @@ Easily download files from any public or private GitHub repository in your GitHu
 - 📝 Generates a workflow summary table for all downloaded files
 - 🛠️ Simple setup and configuration
 - 🧩 Integrates seamlessly with other actions
+- 🖼️ Visual summary in workflow logs
 
 ---
 
@@ -29,7 +29,7 @@ jobs:
 			- name: Checkout
 				uses: actions/checkout@v4
 			- name: Download files from repo
-				uses: AcmeSoftwareLLC/github-downloader@main
+				uses: AcmeSoftwareLLC/github-downloader@v2
 				with:
 					token: ${{ secrets.GITHUB_TOKEN }}
 					owner: AcmeSoftwareLLC
@@ -67,18 +67,36 @@ jobs:
 
 ---
 
-## 📝 Output
+## 📤 Output Parameters
 
-- All downloaded files are saved to the specified output directory.
-- A summary table is generated in the workflow log, listing each source and destination.
+| Name    | Description                                                      |
+|---------|------------------------------------------------------------------|
+| `files` | JSON array of all downloaded file paths (for use in later steps) |
 
 ---
 
 ## 🐞 Troubleshooting
 
-- Ensure your PAT or GITHUB_TOKEN has access to the target repository.
+- Ensure your PAT or GITHUB_TOKEN has access to the target repository (repo/read permissions).
 - Check that your mappings JSON is valid and paths exist in the source repo.
 - Review workflow logs for error messages and summary table.
+- If files are missing, verify the branch/tag/commit and file paths.
+
+---
+
+## ❓ FAQ
+
+**Q: Can I download from private repositories?**
+A: Yes! Use a PAT or GITHUB_TOKEN with access to the target repo.
+
+**Q: Can I download folders?**
+A: No, only individual files are supported.
+
+**Q: What happens if a file doesn't exist?**
+A: The action will fail and report the missing file in the summary.
+
+**Q: Can I use this in composite actions?**
+A: Yes, it works in any workflow step.
 
 ---
 
