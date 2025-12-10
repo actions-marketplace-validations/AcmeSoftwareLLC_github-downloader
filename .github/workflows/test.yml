@@ -20,7 +20,7 @@ jobs:
           owner: creativetimofficial
           repo: public-assets
           token: ${{ secrets.GITHUB_TOKEN }}
-          includes: |
+          mappings: |
             {
               "argon-pro-flutter/chat-screen.jpg": "app/screen.jpg",
               "argon-pro-flutter/beauty-screen.jpg": "next/beauty.jpg"
