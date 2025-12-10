@@ -59,11 +59,13 @@ async function downloadMappedFiles(
 	{ owner, repo, ref, token, outputDir }: DownloadProps,
 ): Promise<string[]> {
 	const octokit = getOctokit(token);
-	await mkdir(outputDir, { recursive: true });
 
 	async function downloadSingleFile(mapping: FileMapping): Promise<string> {
 		const [source, destination] = mapping;
 		const outputPath = join(outputDir, destination);
+		const dir = outputPath.substring(0, outputPath.lastIndexOf("/"));
+
+		await mkdir(dir, { recursive: true });
 
 		try {
 			const { data, status } = await octokit.rest.repos.getContent({
