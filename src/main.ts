@@ -141,7 +141,6 @@ async function writeSummary({
 			[{ data: "Repository" }, { data: repo }],
 			[{ data: "Branch" }, { data: ref }],
 		])
-		.addBreak()
 		.addHeading("Downloaded Files", 2)
 		.addTable([
 			[
