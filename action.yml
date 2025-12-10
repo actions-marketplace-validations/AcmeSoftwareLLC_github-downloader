@@ -7,8 +7,8 @@ branding:
   color: blue
 
 inputs:
-  includes:
-    description: Files to include
+  mappings:
+    description: File mappings in JSON format
     required: true
   repo:
     description: Github repository

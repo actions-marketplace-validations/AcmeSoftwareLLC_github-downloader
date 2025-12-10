@@ -1,40 +1,28 @@
 import { mkdir } from "node:fs/promises";
+import type { RequestOptions } from "node:https";
 import { dirname, join } from "node:path";
 import { getInput, getMultilineInput, setFailed, summary } from "@actions/core";
-import { download, getFiles } from "./utils.js";
+import {
+	download,
+	type FileMapping,
+	getFiles,
+	parseMappings,
+} from "./utils.js";
 
 export async function run(): Promise<void> {
 	try {
-		const pat = getInput("git-pat");
 		const repo = getInput("repo", { required: true });
 		const ref = getInput("ref") || "main";
+		const pat = getInput("git-pat");
 		const outputDir = getInput("output-directory");
-		const includes = getMultilineInput("includes");
+		const options: RequestOptions = pat
+			? { headers: { Authorization: `token ${pat}` } }
+			: {};
 
-		if (!includes.length) {
-			throw new Error("No files specified in 'includes'.");
-		}
+		const mappings = await parseMappings(getMultilineInput("mappings"));
+		const props = { repo, ref, options, outputDir };
 
-		const options = pat ? { headers: { Authorization: `token ${pat}` } } : {};
-
-		const downloads = includes.map(async (include: string) => {
-			const [input, output] = include.split(":");
-			if (!output) {
-				throw new Error(
-					`Invalid 'includes' format: "${include}". Expected format is "source:destination".`,
-				);
-			}
-			const outputLocation = outputDir ? join(outputDir, output) : output;
-			const url = `https://raw.githubusercontent.com/${repo}/${ref}/${input}`;
-
-			await mkdir(dirname(outputLocation), { recursive: true });
-			await download(url, options, outputLocation);
-
-			console.log(`✅ Downloaded "${input}" → "${outputLocation}"`);
-			return outputLocation;
-		});
-
-		const downloadedFiles = await Promise.all(downloads);
+		const downloadedFiles = await downloadMappedFiles(mappings, props);
 
 		const allFiles = outputDir ? await getFiles(outputDir) : downloadedFiles;
 
@@ -54,4 +42,30 @@ export async function run(): Promise<void> {
 	} catch (error) {
 		setFailed(error instanceof Error ? error.message : String(error));
 	}
+}
+
+interface DownloadProps {
+	repo: string;
+	ref: string;
+	options: RequestOptions;
+	outputDir: string;
+}
+
+async function downloadMappedFiles(
+	mappings: FileMapping[],
+	{ repo, ref, options, outputDir }: DownloadProps,
+): Promise<string[]> {
+	async function downloadSingleFile(mapping: FileMapping): Promise<string> {
+		const [input, output] = mapping;
+		const outputLocation = outputDir ? join(outputDir, output) : output;
+		const url = `https://raw.githubusercontent.com/${repo}/${ref}/${input}`;
+
+		await mkdir(dirname(outputLocation), { recursive: true });
+		await download(url, options, outputLocation);
+
+		console.log(`✅ Downloaded "${input}" → "${outputLocation}"`);
+		return outputLocation;
+	}
+
+	return Promise.all(mappings.map(downloadSingleFile));
 }

@@ -1,10 +1,8 @@
-import { mkdir } from "node:fs/promises";
+import { mkdir, readdir } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { getInput, getMultilineInput, setFailed, summary } from "@actions/core";
-import { createWriteStream } from "fs";
-import { readdir } from "fs/promises";
-import { get } from "https";
-import { join as join$1 } from "path";
+import { createWriteStream } from "node:fs";
+import { get } from "node:https";
 
 //#region src/utils.ts
 async function download(url, options, output) {
@@ -34,31 +32,28 @@ async function getFiles(directory) {
 	return (await readdir(directory, {
 		recursive: true,
 		withFileTypes: true
-	})).filter((dirent) => dirent.isFile()).map((dirent) => join$1(directory, dirent.name));
+	})).filter((dirent) => dirent.isFile()).map((dirent) => join(directory, dirent.name));
+}
+async function parseMappings(mappings) {
+	const mappingStr = mappings.join("");
+	return Object.entries(JSON.parse(mappingStr));
 }
 
 //#endregion
 //#region src/main.ts
 async function run() {
 	try {
-		const pat = getInput("git-pat");
 		const repo = getInput("repo", { required: true });
 		const ref = getInput("ref") || "main";
+		const pat = getInput("git-pat");
 		const outputDir = getInput("output-directory");
-		const includes = getMultilineInput("includes");
-		if (!includes.length) throw new Error("No files specified in 'includes'.");
 		const options = pat ? { headers: { Authorization: `token ${pat}` } } : {};
-		const downloads = includes.map(async (include) => {
-			const [input, output] = include.split(":");
-			if (!output) throw new Error(`Invalid 'includes' format: "${include}". Expected format is "source:destination".`);
-			const outputLocation = outputDir ? join(outputDir, output) : output;
-			const url = `https://raw.githubusercontent.com/${repo}/${ref}/${input}`;
-			await mkdir(dirname(outputLocation), { recursive: true });
-			await download(url, options, outputLocation);
-			console.log(`✅ Downloaded "${input}" → "${outputLocation}"`);
-			return outputLocation;
+		const downloadedFiles = await downloadMappedFiles(await parseMappings(getMultilineInput("mappings")), {
+			repo,
+			ref,
+			options,
+			outputDir
 		});
-		const downloadedFiles = await Promise.all(downloads);
 		const allFiles = outputDir ? await getFiles(outputDir) : downloadedFiles;
 		await summary.addHeading("Download Summary").addTable([
 			[{
@@ -76,6 +71,18 @@ async function run() {
 	} catch (error) {
 		setFailed(error instanceof Error ? error.message : String(error));
 	}
+}
+async function downloadMappedFiles(mappings, { repo, ref, options, outputDir }) {
+	async function downloadSingleFile(mapping) {
+		const [input, output] = mapping;
+		const outputLocation = outputDir ? join(outputDir, output) : output;
+		const url = `https://raw.githubusercontent.com/${repo}/${ref}/${input}`;
+		await mkdir(dirname(outputLocation), { recursive: true });
+		await download(url, options, outputLocation);
+		console.log(`✅ Downloaded "${input}" → "${outputLocation}"`);
+		return outputLocation;
+	}
+	return Promise.all(mappings.map(downloadSingleFile));
 }
 
 //#endregion

@@ -3,6 +3,8 @@ import { readdir } from "node:fs/promises";
 import { get, type RequestOptions } from "node:https";
 import { join } from "node:path";
 
+export type FileMapping = [string, string];
+
 async function download(
 	url: string,
 	options: RequestOptions,
@@ -50,4 +52,9 @@ async function getFiles(directory: string): Promise<string[]> {
 		.map((dirent) => join(directory, dirent.name));
 }
 
-export { download, getFiles };
+async function parseMappings(mappings: string[]): Promise<FileMapping[]> {
+	const mappingStr = mappings.join("");
+	return Object.entries(JSON.parse(mappingStr));
+}
+
+export { download, getFiles, parseMappings };

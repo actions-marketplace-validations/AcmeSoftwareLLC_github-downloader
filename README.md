@@ -12,8 +12,10 @@ steps:
       git-pat: ${{ secrets.GIT_PAT }}
       repo: org/reponame
       ref: main
-      includes: |
-        android/key.jks:app/app/key.jks
-        android/key.properties:key.properties
+      mappings: |
+        {
+          "android/acme.jks": "key.jks",
+          "android/key.properties": "key.properties"
+        }
       output-directory: android
 ```
