@@ -9,7 +9,7 @@ on:
 jobs:
   download-success:
     runs-on: ubuntu-latest
-    name: Download Test (Success)
+    name: Successful Download Test
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -17,15 +17,19 @@ jobs:
       - name: Download existing files
         uses: ./
         with:
-          repo: creativetimofficial/public-assets
+          owner: creativetimofficial
+          repo: public-assets
+          token: ${{ secrets.GITHUB_TOKEN }}
           includes: |
-            argon-pro-flutter/chat-screen.jpg:app/screen.jpg
-            argon-pro-flutter/beauty-screen.jpg:next/beauty.jpg
+            {
+              "argon-pro-flutter/chat-screen.jpg": "app/screen.jpg",
+              "argon-pro-flutter/beauty-screen.jpg": "next/beauty.jpg"
+            }
           output-directory: downloads
 
   download-failure:
     runs-on: ubuntu-latest
-    name: Download Test (Failure)
+    name: Failure Download Test
     continue-on-error: true
     steps:
       - name: Checkout
@@ -35,9 +39,13 @@ jobs:
         id: download_step
         uses: ./
         with:
-          repo: creativetimofficial/public-assets
-          includes: |
-            argon-pro-flutter/this-file-does-not-exist.jpg:bad/output.jpg
+          owner: creativetimofficial
+          repo: public-assets
+          token: ${{ secrets.GITHUB_TOKEN }}
+          mappings: |
+            {
+              "argon-pro-flutter/this-file-does-not-exist.jpg": "bad/output.jpg"
+            }
           output-directory: downloads
 
       - name: Verify failure
