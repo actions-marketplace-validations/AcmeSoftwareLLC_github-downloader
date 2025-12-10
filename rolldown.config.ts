@@ -5,7 +5,7 @@ export default defineConfig({
 	output: {
 		esModule: true,
 		file: "dist/index.js",
-		format: "cjs",
+		format: "esm",
 		sourcemap: true,
 	},
 });
