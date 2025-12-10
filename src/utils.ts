@@ -1,11 +1,11 @@
-import { createWriteStream, type Dirent } from "fs";
-import { readdir } from "fs/promises";
-import { get } from "https";
-import { join } from "path";
+import { createWriteStream, type Dirent } from "node:fs";
+import { readdir } from "node:fs/promises";
+import { get, type RequestOptions } from "node:https";
+import { join } from "node:path";
 
 async function download(
 	url: string,
-	options: any,
+	options: RequestOptions,
 	output: string,
 ): Promise<void> {
 	return new Promise((resolve, reject) => {

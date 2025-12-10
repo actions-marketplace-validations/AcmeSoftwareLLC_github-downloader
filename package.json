@@ -10,7 +10,8 @@
 		"format": "npx @biomejs/biome check --write",
 		"package": "tsdown",
 		"package:watch": "tsdown --watch",
-		"local-action": "npx @github/local-action . src/main.ts"
+		"local-action": "npx @github/local-action . src/main.ts",
+		"lint": "npx @biomejs/biome lint"
 	},
 	"keywords": [
 		"github",

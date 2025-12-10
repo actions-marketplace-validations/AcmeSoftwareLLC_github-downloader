@@ -51,7 +51,7 @@ export async function run(): Promise<void> {
 				...(outputDir ? [["All Files in Output", allFiles.join("\n")]] : []),
 			])
 			.write();
-	} catch (error: any) {
+	} catch (error) {
 		setFailed(error instanceof Error ? error.message : String(error));
 	}
 }
