@@ -1,6 +1,6 @@
-import { existsSync } from "node:fs";
-import { writeFile } from "node:fs/promises";
+import { createWriteStream, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { pipeline } from "node:stream/promises";
 import {
 	getInput,
 	getMultilineInput,
@@ -74,8 +74,11 @@ async function downloadMappedFiles(
 				path: source,
 				ref: ref,
 				mediaType: { format: "raw" },
+				request: {
+					parseSuccessResponseBody: false,
+				},
 			});
-			if (status !== 200 || typeof data !== "string") {
+			if (status !== 200) {
 				throw new Error(`Failed to download ${source} (status ${status})`);
 			}
 
@@ -84,7 +87,8 @@ async function downloadMappedFiles(
 				await mkdirP(dirPath);
 			}
 
-			await writeFile(outputPath, data);
+			const stream = data as unknown as ReadableStream;
+			await pipeline(stream, createWriteStream(outputPath));
 			await logFileDownload(source, outputPath);
 		} catch (error) {
 			if (

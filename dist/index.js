@@ -1,6 +1,6 @@
-import { existsSync } from 'node:fs';
-import { readdir, stat, writeFile } from 'node:fs/promises';
+import { existsSync, createWriteStream } from 'node:fs';
 import { join, dirname } from 'node:path';
+import { pipeline } from 'node:stream/promises';
 import require$$0 from 'os';
 import require$$0$1 from 'crypto';
 import require$$0$2 from 'fs';
@@ -30,6 +30,7 @@ import require$$6 from 'string_decoder';
 import require$$0$a from 'diagnostics_channel';
 import require$$2$3 from 'child_process';
 import require$$6$1 from 'timers';
+import { readdir, stat } from 'node:fs/promises';
 
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -53998,15 +53999,19 @@ async function downloadMappedFiles(mappings, { owner, repo, ref, token, outputDi
                 path: source,
                 ref: ref,
                 mediaType: { format: "raw" },
+                request: {
+                    parseSuccessResponseBody: false,
+                },
             });
-            if (status !== 200 || typeof data !== "string") {
+            if (status !== 200) {
                 throw new Error(`Failed to download ${source} (status ${status})`);
             }
             if (dirPath && !existsSync(dirPath)) {
                 console.log(`Creating directory: ${dirPath}`);
                 await ioExports.mkdirP(dirPath);
             }
-            await writeFile(outputPath, data);
+            const stream = data;
+            await pipeline(stream, createWriteStream(outputPath));
             await logFileDownload(source, outputPath);
         }
         catch (error) {
@@ -54041,7 +54046,6 @@ async function writeSummary({ allFiles, downloadedFiles, ref, repo, }) {
         [{ data: "Repository" }, { data: repo }],
         [{ data: "Branch" }, { data: ref }],
     ])
-        .addBreak()
         .addHeading("Downloaded Files", 2)
         .addTable([
         [
