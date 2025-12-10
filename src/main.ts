@@ -1,5 +1,4 @@
 import { mkdir } from "node:fs/promises";
-import type { RequestOptions } from "node:https";
 import { dirname, join } from "node:path";
 import { getInput, getMultilineInput, setFailed, summary } from "@actions/core";
 import {
@@ -16,12 +15,14 @@ export async function run(): Promise<void> {
 		const ref = getInput("ref") || "main";
 		const pat = getInput("git-pat");
 		const outputDir = getInput("output-directory");
-		const options: RequestOptions = pat
-			? { headers: { Authorization: `token ${pat}` } }
-			: {};
+
+		const headers = new Headers();
+		if (pat) {
+			headers.append("Authorization", `token ${pat}`);
+		}
 
 		const mappings = await parseMappings(getMultilineInput("mappings"));
-		const props = { repo, ref, options, outputDir };
+		const props = { repo, ref, headers, outputDir };
 
 		const downloadedFiles = await downloadMappedFiles(mappings, props);
 		const allFiles = await getFiles(outputDir);
@@ -43,13 +44,13 @@ export async function run(): Promise<void> {
 interface DownloadProps {
 	repo: string;
 	ref: string;
-	options: RequestOptions;
+	headers: Headers;
 	outputDir: string;
 }
 
 async function downloadMappedFiles(
 	mappings: FileMapping[],
-	{ repo, ref, options, outputDir }: DownloadProps,
+	{ repo, ref, headers, outputDir }: DownloadProps,
 ): Promise<string[]> {
 	async function downloadSingleFile(mapping: FileMapping): Promise<string> {
 		const [source, destination] = mapping;
@@ -57,7 +58,7 @@ async function downloadMappedFiles(
 		const url = `https://raw.githubusercontent.com/${repo}/${ref}/${source}`;
 
 		await mkdir(dirname(outputPath), { recursive: true });
-		await download(url, options, outputPath);
+		await download(url, headers, outputPath);
 		await logFileDownload(source, outputPath);
 
 		return outputPath;

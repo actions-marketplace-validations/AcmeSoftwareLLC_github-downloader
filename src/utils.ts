@@ -1,45 +1,23 @@
-import { createWriteStream, type Dirent } from "node:fs";
+import type { Dirent } from "node:fs";
 import { readdir, stat } from "node:fs/promises";
-import { get, type RequestOptions } from "node:https";
 import { join } from "node:path";
 
 export type FileMapping = [string, string];
 
+import { createWriteStream } from "node:fs";
+import { pipeline } from "node:stream/promises";
+
 async function download(
 	url: string,
-	options: RequestOptions,
+	headers: Headers,
 	outputPath: string,
 ): Promise<void> {
-	return new Promise((resolve, reject) => {
-		const fileStream = createWriteStream(outputPath);
-		fileStream.on("error", reject);
-
-		const req = get(url, options, (res) => {
-			if (res.statusCode && res.statusCode >= 400) {
-				res.resume();
-				return reject(
-					new Error(`Failed to download ${url} (status ${res.statusCode})`),
-				);
-			}
-
-			res.pipe(fileStream);
-
-			fileStream.on("finish", () => {
-				fileStream.close((err) => {
-					if (err) {
-						return reject(err);
-					}
-					resolve();
-				});
-			});
-		});
-
-		req.on("error", reject);
-
-		req.setTimeout(15000, () => {
-			req.destroy(new Error(`Request timed out for ${url}`));
-		});
-	});
+	const res = await fetch(url, { method: "GET", headers: headers });
+	if (!res.ok || !res.body) {
+		throw new Error(`Failed to download ${url} (status ${res.status})`);
+	}
+	const fileStream = createWriteStream(outputPath);
+	await pipeline(res.body, fileStream);
 }
 
 async function getFiles(directory: string): Promise<string[]> {
@@ -73,4 +51,4 @@ async function logFileDownload(
 	);
 }
 
-export { download, getFiles, parseMappings, logFileDownload };
+export { download, getFiles, logFileDownload, parseMappings };

@@ -2,31 +2,17 @@ import { mkdir, readdir, stat } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { getInput, getMultilineInput, setFailed, summary } from "@actions/core";
 import { createWriteStream } from "node:fs";
-import { get } from "node:https";
+import { pipeline } from "node:stream/promises";
 
 //#region src/utils.ts
-async function download(url, options, outputPath) {
-	return new Promise((resolve, reject) => {
-		const fileStream = createWriteStream(outputPath);
-		fileStream.on("error", reject);
-		const req = get(url, options, (res) => {
-			if (res.statusCode && res.statusCode >= 400) {
-				res.resume();
-				return reject(/* @__PURE__ */ new Error(`Failed to download ${url} (status ${res.statusCode})`));
-			}
-			res.pipe(fileStream);
-			fileStream.on("finish", () => {
-				fileStream.close((err) => {
-					if (err) return reject(err);
-					resolve();
-				});
-			});
-		});
-		req.on("error", reject);
-		req.setTimeout(15e3, () => {
-			req.destroy(/* @__PURE__ */ new Error(`Request timed out for ${url}`));
-		});
+async function download(url, headers, outputPath) {
+	const res = await fetch(url, {
+		method: "GET",
+		headers
 	});
+	if (!res.ok || !res.body) throw new Error(`Failed to download ${url} (status ${res.status})`);
+	const fileStream = createWriteStream(outputPath);
+	await pipeline(res.body, fileStream);
 }
 async function getFiles(directory) {
 	return (await readdir(directory, {
@@ -52,37 +38,49 @@ async function run() {
 		const ref = getInput("ref") || "main";
 		const pat = getInput("git-pat");
 		const outputDir = getInput("output-directory");
-		const options = pat ? { headers: { Authorization: `token ${pat}` } } : {};
+		const headers = new Headers();
+		if (pat) headers.append("Authorization", `token ${pat}`);
 		const mappings = await parseMappings(getMultilineInput("mappings"));
 		const downloadedFiles = await downloadMappedFiles(mappings, {
 			repo,
 			ref,
-			options,
+			headers,
 			outputDir
 		});
-		const allFiles = outputDir ? await getFiles(outputDir) : downloadedFiles;
-		await summary.addHeading("📦 GitHub Downloader Action Summary").addBreak().addRaw(`**Repository:** ${repo}`).addBreak().addRaw(`**Branch:** ${ref}`).addSeparator().addHeading("Downloaded Files", 2).addTable([[{
-			data: "Source Path",
-			header: true
-		}, {
-			data: "Saved As",
-			header: true
-		}], ...mappings.map(([src, _], i) => [src, downloadedFiles[i]])]).addSeparator().addHeading("Output Directory Files", 2).addBreak().addRaw(outputDir ? allFiles.length ? allFiles.map((f) => `- ${f}`).join("\n\n") : "_No files found in output directory._" : "_No output directory specified._").write();
+		const allFiles = await getFiles(outputDir);
+		await writeSummary({
+			downloadedFiles: mappings.map((mapping, index) => [mapping[0], downloadedFiles[index]]),
+			repo,
+			ref,
+			allFiles
+		});
 	} catch (error) {
 		setFailed(error instanceof Error ? error.message : String(error));
 	}
 }
-async function downloadMappedFiles(mappings, { repo, ref, options, outputDir }) {
+async function downloadMappedFiles(mappings, { repo, ref, headers, outputDir }) {
 	async function downloadSingleFile(mapping) {
 		const [source, destination] = mapping;
 		const outputPath = outputDir ? join(outputDir, destination) : destination;
 		const url = `https://raw.githubusercontent.com/${repo}/${ref}/${source}`;
 		await mkdir(dirname(outputPath), { recursive: true });
-		await download(url, options, outputPath);
+		await download(url, headers, outputPath);
 		await logFileDownload(source, outputPath);
 		return outputPath;
 	}
 	return Promise.all(mappings.map(downloadSingleFile));
+}
+async function writeSummary({ allFiles, downloadedFiles, ref, repo }) {
+	let summaryWriter = summary.addHeading("📦 GitHub Downloader Action Summary").addBreak().addTable([[{ data: "Repository" }, { data: repo }], [{ data: "Branch" }, { data: ref }]]).addBreak().addHeading("Downloaded Files", 2).addTable([[{
+		data: "Source Path",
+		header: true
+	}, {
+		data: "Saved As",
+		header: true
+	}], ...downloadedFiles]).addSeparator().addHeading("Output Directory Files", 2);
+	if (allFiles) for (const file of allFiles) summaryWriter = summaryWriter.addRaw(`\n- ${file}`);
+	else summaryWriter = summaryWriter.addRaw("/n_No files found in output directory._");
+	await summaryWriter.addBreak().write();
 }
 
 //#endregion
