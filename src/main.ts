@@ -82,10 +82,11 @@ async function writeSummary({
 	let summaryWriter = summary
 		.addHeading("📦 GitHub Downloader Action Summary")
 		.addBreak()
-		.addRaw(`**Repository:** ${repo}`)
+		.addTable([
+			[{ data: "Repository" }, { data: repo }],
+			[{ data: "Branch" }, { data: ref }],
+		])
 		.addBreak()
-		.addRaw(`**Branch:** ${ref}`)
-		.addSeparator()
 		.addHeading("Downloaded Files", 2)
 		.addTable([
 			[
@@ -99,13 +100,13 @@ async function writeSummary({
 
 	if (allFiles) {
 		for (const file of allFiles) {
-			summaryWriter = summaryWriter.addBreak().addRaw(`- ${file}`);
+			summaryWriter = summaryWriter.addRaw(`\n- ${file}`);
 		}
 	} else {
-		summaryWriter = summaryWriter
-			.addBreak()
-			.addRaw("_No files found in output directory._");
+		summaryWriter = summaryWriter.addRaw(
+			"/n_No files found in output directory._",
+		);
 	}
 
-	await summaryWriter.write();
+	await summaryWriter.addBreak().write();
 }
