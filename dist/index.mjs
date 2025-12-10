@@ -1,8 +1,10 @@
+import { mkdir } from "node:fs/promises";
+import { dirname, join } from "node:path";
 import { getInput, getMultilineInput, setFailed, summary } from "@actions/core";
-import { mkdir, readdir } from "fs/promises";
-import { dirname, join } from "path";
 import { createWriteStream } from "fs";
+import { readdir } from "fs/promises";
 import { get } from "https";
+import { join as join$1 } from "path";
 
 //#region src/utils.ts
 async function download(url, options, output) {
@@ -32,7 +34,7 @@ async function getFiles(directory) {
 	return (await readdir(directory, {
 		recursive: true,
 		withFileTypes: true
-	})).filter((dirent) => dirent.isFile()).map((dirent) => join(directory, dirent.name));
+	})).filter((dirent) => dirent.isFile()).map((dirent) => join$1(directory, dirent.name));
 }
 
 //#endregion
