@@ -8,8 +8,8 @@
 	"scripts": {
 		"bundle": "npm run format && npm run package",
 		"format": "npx @biomejs/biome check --write",
-		"package": "tsdown",
-		"package:watch": "tsdown --watch",
+		"package": "rolldown -c",
+		"package:watch": "rolldown -w -c",
 		"local-action": "npx @github/local-action . src/main.ts .env",
 		"lint": "npx @biomejs/biome lint"
 	},
@@ -28,12 +28,16 @@
 	"license": "MIT",
 	"dependencies": {
 		"@actions/core": "^1.11.1",
-		"@actions/github": "^6.0.1"
+		"@actions/github": "^6.0.1",
+		"@rollup/plugin-commonjs": "^29.0.0",
+		"@rollup/plugin-node-resolve": "^16.0.3",
+		"@rollup/plugin-typescript": "^12.3.0"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.3.8",
 		"@github/local-action": "^6.0.2",
 		"@types/node": "^24.10.2",
+		"rolldown": "^1.0.0-beta.53",
 		"tsdown": "^0.17.2",
 		"typescript": "^5.9.3"
 	}
