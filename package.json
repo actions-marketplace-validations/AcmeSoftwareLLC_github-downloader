@@ -20,7 +20,7 @@
 		"files"
 	],
 	"exports": {
-		".": "./dist/index.js"
+		".": "./dist/index.mjs"
 	},
 	"engines": {
 		"node": ">=24.0.0"
