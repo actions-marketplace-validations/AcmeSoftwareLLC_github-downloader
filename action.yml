@@ -1,5 +1,11 @@
 name: Raw Github Downloader
 description: Download files from Github
+author: Acme Software LLC
+
+branding:
+  icon: download-cloud
+  color: blue
+
 inputs:
   includes:
     description: Files to include
@@ -17,9 +23,5 @@ inputs:
     default: .
   
 runs:
-  using: node20
+  using: node24
   main: dist/index.js
-
-branding:
-  icon: download-cloud
-  color: blue
