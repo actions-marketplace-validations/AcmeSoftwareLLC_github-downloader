@@ -1,6 +1,12 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { getInput, getMultilineInput, setFailed, summary } from "@actions/core";
+import {
+	getInput,
+	getMultilineInput,
+	setFailed,
+	setOutput,
+	summary,
+} from "@actions/core";
 import { getOctokit } from "@actions/github";
 import { RequestError } from "@octokit/request-error";
 import {
@@ -33,6 +39,8 @@ export async function run(): Promise<void> {
 			ref,
 			allFiles,
 		});
+
+		setOutput("files", downloadedFiles);
 	} catch (error) {
 		setFailed(error instanceof Error ? error.message : String(error));
 	}
