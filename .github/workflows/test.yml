@@ -7,41 +7,55 @@ on:
       - main
 
 jobs:
-  download-success:
+  download-test:
     runs-on: ubuntu-latest
-    name: Download Test (Success)
+    strategy:
+      matrix:
+        case:
+          - name: success
+            mappings: |
+              {
+                "argon-pro-flutter/chat-screen.jpg": "app/screen.jpg",
+                "argon-pro-flutter/beauty-screen.jpg": "next/beauty.jpg"
+              }
+            expect_failure: false
+          - name: failure
+            mappings: |
+              {
+                "argon-pro-flutter/this-file-does-not-exist.jpg": "bad/output.jpg"
+              }
+            expect_failure: true
+    name: Download Test - ${{ matrix.case.name }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Download existing files
+      - name: Download files
+        id: download
+        continue-on-error: ${{ matrix.case.expect_failure }}
         uses: ./
         with:
-          repo: creativetimofficial/public-assets
-          includes: |
-            argon-pro-flutter/chat-screen.jpg:app/screen.jpg
-            argon-pro-flutter/beauty-screen.jpg:next/beauty.jpg
+          owner: creativetimofficial
+          repo: public-assets
+          ref: master
+          token: ${{ secrets.GITHUB_TOKEN }}
+          mappings: ${{ matrix.case.mappings }}
           output-directory: downloads
 
-  download-failure:
-    runs-on: ubuntu-latest
-    name: Download Test (Failure)
-    continue-on-error: true
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Download non-existent file
-        id: download_step
-        uses: ./
-        with:
-          repo: creativetimofficial/public-assets
-          includes: |
-            argon-pro-flutter/this-file-does-not-exist.jpg:bad/output.jpg
-          output-directory: downloads
+      - name: Print downloaded files
+        if: ${{ !matrix.case.expect_failure }}
+        run: |
+          echo "✅ Downloaded files:"
+          echo "${{ steps.download.outputs.files }}"
 
       - name: Verify failure
-        if: steps.download_step.outcome == 'success'
+        if: ${{ matrix.case.expect_failure && steps.download.outcome == 'success' }}
         run: |
           echo "❌ Expected this step to fail but it succeeded"
           exit 1
+
+      - name: Add summary
+        run: |
+          echo "### Test Case: ${{ matrix.case.name }}" >> $GITHUB_STEP_SUMMARY
+          echo "Outcome: ${{ steps.download.outcome }}" >> $GITHUB_STEP_SUMMARY
+          echo "Files: ${{ steps.download.outputs.files }}" >> $GITHUB_STEP_SUMMARY
